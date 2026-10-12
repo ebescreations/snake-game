@@ -1,0 +1,368 @@
+:root {
+  --bg: #11141a;
+  --panel: #1a1f29;
+  --line: #262d3a;
+  --text: #e6e9ef;
+  --muted: #8b95a7;
+  --accent: #4ade80;
+  /* game.js hardcodes this amber for the food too. Change both. */
+  --food: #fbbf24;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: start center;
+  padding: 24px 16px 48px;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 480px;
+}
+
+.bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+}
+
+.scores {
+  display: flex;
+  gap: 18px;
+  margin: 0;
+  text-align: right;
+}
+
+.score dt {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.score dd {
+  margin: 0;
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* Tags which level the Best belongs to. Without it, switching levels looks
+   like the record got wiped. */
+.qualifier {
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.75;
+}
+
+.qualifier::before {
+  content: "(";
+}
+
+.qualifier::after {
+  content: ")";
+}
+
+/* --- Controls --------------------------------------------------------- */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.field {
+  /* auto basis so each select sizes to its own longest option. With a 0
+     basis, Level got squeezed down to match the much shorter Mode.
+     min-width is where they wrap on narrow screens. */
+  flex: 1 1 auto;
+  min-width: 116px;
+}
+
+.field-action {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.field select,
+.field button {
+  width: 100%;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.field button {
+  padding: 7px 14px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.field button:hover {
+  border-color: var(--muted);
+}
+
+.field select:focus-visible,
+.field button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* --- Board ------------------------------------------------------------ */
+
+.board {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+canvas:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 16px;
+  background: rgb(17 20 26 / 0.78);
+  /* Don't remove this. The overlay covers the whole canvas in the states
+     where clicking matters, so without it every click and mouse move
+     meant for the board gets swallowed. */
+  pointer-events: none;
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+.overlay-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.overlay-goal {
+  margin: 0;
+  max-width: 22em;
+  font-size: 0.95rem;
+}
+
+/* The level you're about to play. A chip rather than another line of text,
+   so it reads as a setting instead of more instructions. */
+.overlay-level {
+  justify-self: center;
+  margin: 2px 0 0;
+  padding: 3px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgb(26 31 41 / 0.9);
+  font-size: 0.78rem;
+}
+
+/* showOverlay() passes '' for slots a state doesn't use. Collapse those. */
+.overlay-goal:empty,
+.overlay-level:empty,
+.overlay-text:empty {
+  display: none;
+}
+
+.overlay-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.status {
+  min-height: 1.5em;
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* --- Instructions ----------------------------------------------------- */
+
+.guide {
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 0.85rem;
+}
+
+.guide h2 {
+  margin: 0;
+  padding: 11px 14px 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* The bits a new player actually needs. Never behind a click. */
+.quickstart {
+  margin: 8px 0 12px;
+  padding: 0 14px 0 32px;
+}
+
+.quickstart li {
+  margin-bottom: 3px;
+}
+
+.guide details {
+  border-top: 1px solid var(--line);
+}
+
+.guide summary {
+  padding: 9px 14px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.guide summary:hover {
+  color: var(--text);
+}
+
+.guide summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.guide details ul {
+  margin: 0 0 12px;
+  padding: 0 14px 0 32px;
+  color: var(--muted);
+}
+
+.guide details li {
+  margin-bottom: 7px;
+}
+
+.guide strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.levels {
+  width: calc(100% - 28px);
+  margin: 0 14px;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.levels th,
+.levels td {
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.levels thead th {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.levels tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.levels td {
+  color: var(--muted);
+}
+
+.levels tbody tr:last-child th,
+.levels tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.guide-note {
+  margin: 10px 14px 14px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 1px 5px;
+  margin: 0 1px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--bg);
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: center;
+  color: var(--text);
+}
+
+/* --- Device-specific instructions ------------------------------------- */
+
+.for-touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .for-pointer {
+    display: none;
+  }
+
+  .for-touch {
+    display: list-item;
+  }
+}

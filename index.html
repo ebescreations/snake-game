@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake</title>
+  <meta name="description" content="A small browser Snake game with four speed levels and keyboard, mouse or touch steering. No installs, no dependencies.">
+  <meta name="theme-color" content="#11141a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="bar">
+      <h1>Snake</h1>
+      <dl class="scores">
+        <div class="score">
+          <dt>Score</dt>
+          <dd id="score">0</dd>
+        </div>
+        <div class="score">
+          <dt>Best <span class="qualifier" id="best-level">Classic</span></dt>
+          <dd id="best">0</dd>
+        </div>
+        <div class="score">
+          <dt>Food value</dt>
+          <dd id="per-food">+10</dd>
+        </div>
+      </dl>
+    </header>
+
+    <div class="controls">
+      <div class="field">
+        <label for="level">Level</label>
+        <select id="level">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="advanced">Advanced</option>
+          <option value="classic">Classic</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="mode">Mode</label>
+        <select id="mode">
+          <option value="keyboard">Keyboard</option>
+          <option value="mouse">Mouse</option>
+          <option value="both">Keyboard + mouse</option>
+        </select>
+      </div>
+      <div class="field field-action">
+        <button type="button" id="new-game">New game</button>
+      </div>
+    </div>
+
+    <div class="board">
+      <canvas id="board" width="480" height="480" tabindex="0"
+              aria-label="Snake game board. Steer with the mouse, the arrow keys, or W A S D, depending on the selected mode."></canvas>
+      <div id="overlay" class="overlay">
+        <p class="overlay-title" id="overlay-title">Ready?</p>
+        <p class="overlay-goal" id="overlay-goal">Eat the food, avoid the walls and your own tail.</p>
+        <p class="overlay-level" id="overlay-level">Classic - starts gently and speeds up as you go</p>
+        <p class="overlay-text" id="overlay-text">Click the board or press an arrow key to start</p>
+      </div>
+    </div>
+
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+
+    <section class="guide">
+      <h2>How to play</h2>
+
+      <ul class="quickstart">
+        <li>Eat the food. Every piece makes your snake longer.</li>
+        <li>Don't hit the walls or your own tail.</li>
+        <li class="for-pointer">Steer with the arrow keys or your mouse.</li>
+        <li class="for-touch">Swipe to steer.</li>
+      </ul>
+
+      <details>
+        <summary>More detail</summary>
+        <ul>
+          <li>No U-turns. From wherever you are heading you can only turn left or right.</li>
+          <li class="for-pointer">In <strong>Mouse</strong> mode the snake heads for the cell under
+            your pointer, marked with a faint outline. Keep the pointer on the board: move it away
+            and the snake carries straight on.</li>
+          <li class="for-pointer">A click or <kbd>Space</kbd> starts the game, and pauses and
+            resumes it. <kbd>R</kbd> or the New game button begins a fresh run.</li>
+          <li class="for-touch">Tap to start, and to pause and resume. Swiping steers whichever
+            mode is selected.</li>
+          <li>Hitting a wall or your own tail ends the run straight away.</li>
+          <li>Fill the whole board to win.</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>Levels and scoring</summary>
+        <table class="levels">
+          <thead>
+            <tr>
+              <th scope="col">Level</th>
+              <th scope="col">What it's like</th>
+              <th scope="col">Per food</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Easy</th><td>Slow. The place to learn.</td><td>5</td></tr>
+            <tr><th scope="row">Medium</th><td>Quick, and stays that way.</td><td>15</td></tr>
+            <tr><th scope="row">Advanced</th><td>Very quick from the first move.</td><td>25</td></tr>
+            <tr><th scope="row">Classic</th><td>Starts gently, then speeds up with every
+              piece until it is as quick as Advanced.</td><td>8 &rarr; 23</td></tr>
+          </tbody>
+        </table>
+        <p class="guide-note">Faster play pays more per piece of food, so scores do not compare
+          between levels. Each level keeps its own best, shown in the Best panel. Changing level
+          starts a new game.</p>
+      </details>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
