@@ -38,6 +38,13 @@
 
   const MODES = { keyboard: 1, mouse: 1, both: 1 };
 
+  // Same query styles.css uses to swap the guide text, so the overlay can't
+  // end up saying "click" while the guide right below it says "tap". Touch
+  // devices don't get the Mode select at all: swiping is the only input
+  // there, so all three options would behave the same.
+  const TOUCH_FIRST = window.matchMedia('(hover: none) and (pointer: coarse)');
+  const isTouch = () => TOUCH_FIRST.matches;
+
   const DEFAULT_LEVEL = 'classic';
   const DEFAULT_MODE = 'both';
 
@@ -405,6 +412,10 @@
 
   window.addEventListener('resize', sizeCanvas);
 
+  // Plugging in a keyboard flips this mid-session, and the hints change
+  // wording with it. Nothing repaints on its own while we're idle.
+  TOUCH_FIRST.addEventListener('change', render);
+
   // --- Simulation ------------------------------------------------------
   // Input only ever picks a heading. Mouse and keyboard both stop here and
   // everything past this point treats them identically, dying included.
@@ -548,10 +559,17 @@
   }
 
   function startHint() {
+    if (isTouch()) return 'Tap the board to start';
     // Arrow keys are dead in Mouse mode, but a click always starts.
     return inputMode === 'mouse'
       ? 'Click the board to start'
       : 'Click the board or press an arrow key to start';
+  }
+
+  // Also goes into the live region, so a screen reader reads it out. Naming
+  // the R key to someone on a phone is worse than saying nothing.
+  function againHint() {
+    return isTouch() ? 'Tap to play again' : 'Click or press R to play again';
   }
 
   function updateOverlay() {
@@ -572,23 +590,23 @@
         break;
 
       case STATE.PAUSED:
-        showOverlay('Paused', '', '', 'Click or press space to resume');
+        showOverlay('Paused', '', '',
+          isTouch() ? 'Tap to resume' : 'Click or press space to resume');
         setText(statusEl, 'Paused.');
         break;
 
       case STATE.OVER:
         if (newBest) {
-          showOverlay('New best!', `${score} on ${label}`, '',
-            'Click or press R to play again');
+          showOverlay('New best!', `${score} on ${label}`, '', againHint());
           setText(statusEl,
             `${overMessage} New best of ${score} on ${label}. ` +
-            'Click or press R to play again.');
+            `${againHint()}.`);
         } else {
           showOverlay('Game over', `Score ${score} on ${label} \u00b7 best ${best}`, '',
-            'Click or press R to play again');
+            againHint());
           setText(statusEl,
             `${overMessage} Scored ${score} on ${label}. Best ${best}. ` +
-            'Click or press R to play again.');
+            `${againHint()}.`);
         }
         break;
 
@@ -596,10 +614,10 @@
         showOverlay('You filled the board!',
           newBest ? `New best of ${score} on ${label}` : `Score ${score} on ${label}`,
           '',
-          'Click or press R to play again');
+          againHint());
         setText(statusEl,
           `You filled the board and scored ${score} on ${label}. ` +
-          'Click or press R to play again.');
+          `${againHint()}.`);
         break;
     }
   }
