@@ -39,7 +39,7 @@
           <option value="classic">Classic</option>
         </select>
       </div>
-      <div class="field">
+      <div class="field for-pointer">
         <label for="mode">Mode</label>
         <select id="mode">
           <option value="keyboard">Keyboard</option>
@@ -54,7 +54,7 @@
 
     <div class="board">
       <canvas id="board" width="480" height="480" tabindex="0"
-              aria-label="Snake game board. Steer with the mouse, the arrow keys, or W A S D, depending on the selected mode."></canvas>
+              aria-label="Snake game board. Steer with the arrow keys, W A S D, or the mouse, depending on the selected mode. On a touchscreen, swipe to steer."></canvas>
       <div id="overlay" class="overlay">
         <p class="overlay-title" id="overlay-title">Ready?</p>
         <p class="overlay-goal" id="overlay-goal">Eat the food, avoid the walls and your own tail.</p>
@@ -114,6 +114,8 @@
           starts a new game.</p>
       </details>
     </section>
+
+    <p class="footnote for-pointer">Works on a phone as well. Swipe to steer.</p>
   </main>
 
   <script src="game.js"></script>
