@@ -353,6 +353,16 @@ kbd {
 
 /* --- Device-specific instructions ------------------------------------- */
 
+/* Phone players already get told about swiping in the guide, but that text
+   is hidden on desktop, so someone on a laptop would never know the game
+   works on a phone at all. This line is for them, hence .for-pointer. */
+.footnote {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
 .for-touch {
   display: none;
 }
